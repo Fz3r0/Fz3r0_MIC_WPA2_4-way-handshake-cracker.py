@@ -5,27 +5,28 @@ from pbkdf2 import PBKDF2
 import binascii
 import os
 
+#######################################################################################
+#
+# BANNER
+#
+
 def banner():
     clear_screen()
-
-
-    print(f"################################################################################################")
-    print(f"#                                                                                              #")
-    print(f"#           {WHITE}@@@@@@@@@@@@@@@@@@{RESET}               ((_.-'-._.-| WPA2-PSK Password MIC Cracker |-._.-'-._))    #")
-    print(f"#         {WHITE}@@@@@@@@@@@@@@@@@@@@@@@{RESET}                                                              #")
-    print(f"#       {WHITE}@@@@@@@@@@@@@@@@@@@@@@@@@@@{RESET}          Networking & Cyber-Security PCAP Analysis Tool    #")
-    print(f"#      {WHITE}@@@@@@@@@@@@@@@@@@@@@@@@@@@@@{RESET}                                                           #")
-    print(f"#     {WHITE}@@@@@@@@@@@@@@@/      \\@@@/   @{RESET}        [+] Cyber-Weapon:............. BlackShark         #")
-    print(f"#    {WHITE}@@@@@@@@@@@@@@@@\\  {RED}O{WHITE}   @@  @ {RED}O{WHITE} @{RESET}        [+] Version:.................. 3.6                ")
-    print(f"#    {WHITE}@@@@@@@@@@@@@ @@@@@@@@@@  | \\@@@@@{RESET}      [+] Author:................... Fz3r0              ")
-    print(f"#    {WHITE}@@@@@@@@@@@@@ @@@@@@@@@\\__@_/@@@@@{RESET}      [+] Github:................... github.com/Fz3r0   ")
-    print(f"#     {WHITE}@@@@@@@@@@@@@@@/,/,/./'/_|.\\'\\,\\{RESET}       [+] Twitter:.................. @Fz3r0_OPs         ")
-    print(f"#       {WHITE}@@@@@@@@@@@@@|  | | | | | | | |{RESET}      [+] Youtube:.................. @Fz3r0_OPs         ")
-    print(f"#                   {WHITE}\\_|_|_|_|_|_|_|_|{RESET}                                                        ")
-    print(f"#                                                                                              #")
-    print(f"################################################################################################")
-
-
+    print(f"#################################################################################################")
+    print(f"#                                                                                               #")
+    print(f"#           {WHITE}@@@@@@@@@@@@@@@@@@{RESET}               ((_.-'-.| WPA2-PSK Password MIC Cracker |.-'-._))  #")
+    print(f"#         {WHITE}@@@Fz3r0@@@@@@@@@@@@@@@{RESET}                                                               #")
+    print(f"#       {WHITE}@@@@@@@@@@@@@@@@@@@@@@@@@@@{RESET}          - Offline WPA2-PSK Passphrase Bruteforce Attack -  #")
+    print(f"#      {WHITE}@@@@@@@@@@@@@@@@@@@@@@@@@@@@@{RESET}                                                            #")
+    print(f"#     {WHITE}@@@@@@@@@@@@@@@/      \\@@@/   @{RESET}        [+] Cyber-Weapon:............. WPA2-PSK Cracker    #")
+    print(f"#    {WHITE}@@@@@@@@@@@@@@@@\\  {RED}O{WHITE}   @@  @ {RED}O{WHITE} @{RESET}        [+] Version:.................. 3.6                 #")
+    print(f"#    {WHITE}@@@@@@@@@@@@@ @@@@@@@@@@  | \\@@@@@{RESET}      [+] Author:................... Fz3r0               #")
+    print(f"#    {WHITE}@@@@@@@@@@@@@ @@@@@@@@@\\__@_/@@@@@{RESET}      [+] Github:................... github.com/Fz3r0    #")
+    print(f"#     {WHITE}@@@@@@@@@@@@@@@/,/,/./'/_|.\\'\\,\\{RESET}       [+] Twitter:.................. @Fz3r0_OPs          #")
+    print(f"#       {WHITE}@@@@@@@@@@@@@|  | | | | | | | |{RESET}      [+] Youtube:.................. @Fz3r0_OPs          #")
+    print(f"#                   {WHITE}\\_|_|_|_|_|_|_|_|{RESET}                                                           #")
+    print(f"#                                                                                               #")
+    print(f"#################################################################################################")
 
 #######################################################################################
 #
@@ -47,26 +48,27 @@ class WPA2Handshake:
 def testData():
 
     ## Instructions
-    print("INSTRUCTIONS")
+    print
+    print(f"### INSTRUCTIONS:")
     print()
-    print ("[!] IMPORTANT: Open the .pcap of the WPA2-PSK (Personal) authentication in Blackshark and extract the following data:")
+    print ("[!] IMPORTANT: To collect the data -> Open the .pcap frame capture of the WPA2-PSK (Personal) authentication in Blackshark and extract the following:")
     print()
 
     ## SSID   (Default: Fz3r0::CWAP
-    print("[+] Paste the SSID of the WLAN / or Press Enter to use Default = Fz3r0::CWAP") 
+    print("[+] Paste the SSID of the WLAN               / or Press Enter to use Default  =  Fz3r0::CWAP") 
     WPA2Handshake.ssid        = input("->> ") or "Fz3r0::CWAP"
 
     ## AP     (Default: Telmex
-    print("[+] Paste the WLAN Address of the AP (BSSID) / or Press Enter to use Default =  50:4e:dc:90:2e:b8)")
+    print("[+] Paste the WLAN Address of the AP (BSSID) / or Press Enter to use Default  =  50:4e:dc:90:2e:b8)")
     WPA2Handshake.macAP       = input("->> ") or "50:4e:dc:90:2e:b8"
 
     ## STA    (Default: Xiaomi Phone
-    print("[+] Paste the WLAN Address of client STA / or Press Enter to use Default =  3c:13:5a:f2:46:88)")
+    print("[+] Paste the WLAN Address of client STA    / or Press Enter to use Default   =  3c:13:5a:f2:46:88)")
     WPA2Handshake.macCli      = input("->> ") or "3c:13:5a:f2:46:88"
 
     ## Anonce (Default: M1 nonce (nonce from the AP/Authenticator)
     print("[+] Paste the Anonce - EAPOL M1 HEX Nonce - AP/Authenticator Nonce")
-    print("[?] Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M1 Nonce, Right Click, Copy > As HEX Stream")
+    print(f"[?] {NEON_YELLOW}Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M1 Nonce, Right Click, Copy > As HEX Stream")
     WPA2Handshake.anonce      = input("->> ") or "f1b3a392f9a10693e031deb0edb996c27974f297c7963c005a5cd36116c80777"
 
     ## Snonce = M2 nonce (nonce from the STA/Supplicant)  
@@ -102,7 +104,9 @@ def viewdata():
 
     print("\n=================================================================================================\n")
 
-    print(f"{BOLD}{CYAN}4-Way-Handshake (EAPOL M1 & M2) data needed for MIC validation & cracking:{RESET}\n")
+    print(f"{BOLD}### EAPOL M1 & M2 data:{RESET}\n")
+
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {NEON_YELLOW}4-Way-Handshake (EAPOL M1 & M2) data needed for MIC validation & cracking:{RESET}\n")
     
     # Mostrar cada elemento de datos de manera estructurada
     print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} SSID:............................. ", f"{TEAL}{WPA2Handshake.ssid}{RESET}")
@@ -114,8 +118,6 @@ def viewdata():
     print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} EAPOL M2 Payload:................. ", f"{GREEN}{WPA2Handshake.Eapol2frame}{RESET}")
     
     print("\n=================================================================================================\n")
-
-
 
 
 #######################################################################################
@@ -216,13 +218,15 @@ def main():
 
         print(BOLD + "Please select an option by entering the corresponding number and press Enter to proceed." + RESET)
         print()
-        print("[0] - Launch Fz3r0 MIC Cracker")
-        print("[9] - Exit")
+        print(f"{WHITE}[{BRIGHT_BLUE}0{WHITE}]{RESET} Launch Fz3r0 MIC Cracker")
+        print(f"{WHITE}[{BRIGHT_BLUE}9{WHITE}]{RESET} Exit")
         print()
-        print("\n=================================================================================================\n")
+
 
         try:
-            opt = int(input("->> "))
+            opt = int(input(f"{BOLD}{WHITE}->>{RESET} "))
+            print()
+            print("\n=================================================================================================\n")
             print()
             if opt == 9:
                 print("Exiting... Goodbye!")
@@ -269,8 +273,10 @@ def passmode():
 
                 banner()
                 viewdata()
-                print(f"[*] Passphrase to Audit:       {RED}{WPA2Handshake.passw}{RESET}\n")  
-
+                print()
+                print(f"{BOLD}### Manual Passphrase Selection:{RESET}\n")
+                print(f"{WHITE}[{RED}!{WHITE}]{RESET} Passphrase to Audit:............... {RED}{WPA2Handshake.passw}{RESET}\n")  
+                print("\n=================================================================================================\n")
                 checkPasswd()  # Check the validity of the password (this function should be defined elsewhere)
             else:
                 print("Invalid selection. Please enter a valid option (0, 1, or 9).\n")  # Inform the user of invalid input if it's not 0, 1, or 9
