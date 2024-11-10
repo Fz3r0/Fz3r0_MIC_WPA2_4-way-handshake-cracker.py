@@ -38,14 +38,21 @@ class WPA2Handshake:
 
 ## Function: Ingresar Valores en shell
 def testData():
-    WPA2Handshake.ssid        = input("Enter the ssid in string value (e.g. Fz3r0_CWAP_SSID)        :: ") or "Facility"
-    WPA2Handshake.macAP       = input("Enter the MAC Address of AP (e.g. F0:F0:F0:F0:F0:F0)         :: ") or "10:f0:68:6a:7d:3c"
-    WPA2Handshake.macCli      = input("Enter the MAC Address of client STA (e.g. B2:B2:B2:B2:B2:B2) :: ") or "ee:c1:e4:4f:1f:f3"
-    WPA2Handshake.anonce      = input("Enter the Anonce (e.g. EAPOL M1 HEX Nonce = Anonce)          :: ") or "36efa59edfe46fd84d111dd7d8a390d911579e8e6caa86412a528f518e08b2d1"
-    WPA2Handshake.snonce      = input("Enter the Snonce (e.g. EAPOL M2 HEX Nonce = Snonce)          :: ") or "8e79a5461b1dee8a0c1e9a67addb86f1a54df4c13e91bbda2e8b383e6d773d9e"
-    WPA2Handshake.mic         = input("Enter the MIC (e.g. EAPOL M2 MIC)                            :: ") or "0a5faaac4272850c8e987bb27b3fca8b"
-    WPA2Handshake.Eapol2frame = input("Enter the EAPOL2 Frame in HEX (export > HEX-string)          :: ") or "0103007502010a000000000000000000018e79a5461b1dee8a0c1e9a67addb86f1a54df4c13e91bbda2e8b383e6d773d9e00000000000000000000000000000000000000000000000000000000000000000a5faaac4272850c8e987bb27b3fca8b001630140100000fac040100000fac040100000fac020000"
-    
+    ## SSID = Fz3r0::CWAP
+    WPA2Handshake.ssid        = input("Enter the ssid in string value (e.g. Fz3r0::CWAP)                        :: ") or "Fz3r0::CWAP"
+    ## AP   = Telmex
+    WPA2Handshake.macAP       = input("Enter the MAC Address of AP (e.g. F0:F0:F0:F0:F0:F0)                     :: ") or "50:4e:dc:90:2e:b8"
+    ## STA  = Xiaomi Phone
+    WPA2Handshake.macCli      = input("Enter the MAC Address of client STA (e.g. B2:B2:B2:B2:B2:B2)             :: ") or "3c:13:5a:f2:46:88"
+    ## Anonce = M1 nonce (nonce from the AP/Authenticator)
+    WPA2Handshake.anonce      = input("Enter the Anonce (e.g. EAPOL M1 HEX Nonce = Anonce (Copy HEX Stream))    :: ") or "f1b3a392f9a10693e031deb0edb996c27974f297c7963c005a5cd36116c80777"
+    ## Anonce = M1 nonce (nonce from the AP/Authenticator)
+    WPA2Handshake.snonce      = input("Enter the Snonce (e.g. EAPOL M2 HEX Nonce = Snonce (Copy HEX Stream))    :: ") or "a3911874480ff4e4b772c016d107ace5e0fb5fd972e5deeae1f662edeb8b4fc0"
+    ## Snonce = M2 nonce (nonce from the STA/Supplicant)    
+    WPA2Handshake.mic         = input("Enter the MIC (e.g. EAPOL M2 MIC)                                        :: ") or "07d2e88db2254f675d349996ef95ad93"
+    # OJO! para sacar el HEX stream del EAPOL 2, se debe seleccionar solo el 802.1X element del M2 (último "directorio" del frame), no todo el frame 802.11
+    WPA2Handshake.Eapol2frame = input("Enter the EAPOL2 Frame in HEX (802.1X Elemet ONLY - export > HEX-Stream) :: ") or "0103007b02010a00000000000000000001a3911874480ff4e4b772c016d107ace5e0fb5fd972e5deeae1f662edeb8b4fc0000000000000000000000000000000000000000000000000000000000000000007d2e88db2254f675d349996ef95ad93001c301a0100000fac040100000fac040100000fac0280400000000fac06"
+                    
 ####################################################################################################################
 #
 # Function: Algoritmo PRF512 (Para obtener PTK)
@@ -166,7 +173,7 @@ def passmode():
         elif opt == 1:
             crackPasswd()
         elif opt == 0:
-            WPA2Handshake.passw = input("input the password to check: > ") or "Induction"
+            WPA2Handshake.passw = input("input the password to check: > ") or "Hunter2006"
             checkPasswd()
 
 def crackPasswd():
