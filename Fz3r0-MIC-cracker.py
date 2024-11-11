@@ -55,35 +55,35 @@ def testData():
     print()
 
     ## SSID   (Default: Fz3r0::CWAP
-    print("[+] Paste the SSID of the WLAN               / or Press Enter to use Default  =  Fz3r0::CWAP") 
+    print(f"[+] Paste the SSID of the WLAN               / or Press Enter to use Default  =  Fz3r0::CWAP") 
     WPA2Handshake.ssid        = input("->> ") or "Fz3r0::CWAP"
 
     ## AP     (Default: Telmex
-    print("[+] Paste the WLAN Address of the AP (BSSID) / or Press Enter to use Default  =  50:4e:dc:90:2e:b8)")
+    print(f"[+] Paste the WLAN Address of the AP (BSSID) / or Press Enter to use Default  =  50:4e:dc:90:2e:b8)")
     WPA2Handshake.macAP       = input("->> ") or "50:4e:dc:90:2e:b8"
 
     ## STA    (Default: Xiaomi Phone
-    print("[+] Paste the WLAN Address of client STA    / or Press Enter to use Default   =  3c:13:5a:f2:46:88)")
+    print(f"[+] Paste the WLAN Address of client STA    / or Press Enter to use Default   =  3c:13:5a:f2:46:88)")
     WPA2Handshake.macCli      = input("->> ") or "3c:13:5a:f2:46:88"
 
     ## Anonce (Default: M1 nonce (nonce from the AP/Authenticator)
-    print("[+] Paste the Anonce - EAPOL M1 HEX Nonce - AP/Authenticator Nonce")
-    print(f"[?] {NEON_YELLOW}Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M1 Nonce, Right Click, Copy > As HEX Stream")
+    print(f"[+] Paste the Anonce - EAPOL M1 HEX Nonce - AP/Authenticator Nonce")
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {NEON_YELLOW}Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M1 Nonce, Right Click, Copy > As HEX Stream")
     WPA2Handshake.anonce      = input("->> ") or "f1b3a392f9a10693e031deb0edb996c27974f297c7963c005a5cd36116c80777"
 
     ## Snonce = M2 nonce (nonce from the STA/Supplicant)  
-    print("[+] Paste the Snonce - EAPOL M2 HEX Nonce  - STA/Supplicant Nonce")
-    print("[?] Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M2 Nonce, Right Click, Copy > As HEX Stream")
+    print(f"[+] Paste the Snonce - EAPOL M2 HEX Nonce  - STA/Supplicant Nonce")
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M2 Nonce, Right Click, Copy > As HEX Stream")
     WPA2Handshake.snonce      = input("->> ") or "a3911874480ff4e4b772c016d107ace5e0fb5fd972e5deeae1f662edeb8b4fc0"
 
     ## MIC   
     print("[+] Paste the MIC (e.g. EAPOL M2 MIC)  :: ")
-    print("[?] Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M2 MIC, Right Click, Copy > As HEX Stream")
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M2 MIC, Right Click, Copy > As HEX Stream")
     WPA2Handshake.mic         = input("->> ") or "07d2e88db2254f675d349996ef95ad93"
 
     # EAPOL 2 Frame > Only Payload (No Headers or FCS)
-    print("[+] Paste only the payload of EAPOL2 Frame in HEX (excuding MAC Header, LLC and FCS)")
-    print("[?] Hint: To copy 'HEX stream' of EAPOL 2 frame payload, you should select ONLY the 802.1X Information Element of the M2 (the last 'directory' of the frame), you should NOT copy the entire 802.11 frame.")
+    print(f"[+] Paste only the payload of EAPOL2 Frame in HEX (excuding MAC Header, LLC and FCS)")
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} Hint: To copy 'HEX stream' of EAPOL 2 frame payload, you should select ONLY the 802.1X Information Element of the M2 (the last 'directory' of the frame), you should NOT copy the entire 802.11 frame.")
     WPA2Handshake.Eapol2frame = input("->> ") or "0103007b02010a00000000000000000001a3911874480ff4e4b772c016d107ace5e0fb5fd972e5deeae1f662edeb8b4fc0000000000000000000000000000000000000000000000000000000000000000007d2e88db2254f675d349996ef95ad93001c301a0100000fac040100000fac040100000fac0280400000000fac06"
 
     banner()
@@ -104,18 +104,18 @@ def viewdata():
 
     print("\n=================================================================================================\n")
 
-    print(f"{BOLD}### EAPOL M1 & M2 data:{RESET}\n")
+    print(f"{BOLD}{WHITE}###{RED} EAPOL M1 & M2 data:{RESET}\n")
 
     print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {NEON_YELLOW}4-Way-Handshake (EAPOL M1 & M2) data needed for MIC validation & cracking:{RESET}\n")
     
     # Mostrar cada elemento de datos de manera estructurada
-    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} SSID:............................. ", f"{TEAL}{WPA2Handshake.ssid}{RESET}")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} SSID:............................. ", f"{PURPLE}{WPA2Handshake.ssid}{RESET}")
     print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} MAC Address (AP):................. ", f"{TEAL}{str(WPA2Handshake.macAP)}{RESET}")
-    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} MAC Address (STA):................ ", f"{TEAL}{str(WPA2Handshake.macCli)}{RESET}")
-    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} Anonce (AP):...................... ", f"{PINK}{WPA2Handshake.anonce}{RESET}")
-    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} Snonce (STA):..................... ", f"{PINK}{WPA2Handshake.snonce}{RESET}")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} MAC Address (STA):................ ", f"{ORANGE}{str(WPA2Handshake.macCli)}{RESET}")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} Anonce (AP):...................... ", f"{TEAL}{WPA2Handshake.anonce}{RESET}")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} Snonce (STA):..................... ", f"{ORANGE}{WPA2Handshake.snonce}{RESET}")
     print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} MIC (EAPOL M2):................... ", f"{MAGENTA}{WPA2Handshake.mic}{RESET}")
-    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} EAPOL M2 Payload:................. ", f"{GREEN}{WPA2Handshake.Eapol2frame}{RESET}")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} EAPOL M2 Payload:................. ", f"{CYAN}{WPA2Handshake.Eapol2frame}{RESET}")
     
     print("\n=================================================================================================\n")
 
@@ -206,17 +206,16 @@ def main():
     while True:
         banner()
         print("\n=================================================================================================\n")
-        print(f"{BOLD}### DISCLAIMER:{RESET}\n")
+        print(f"{BOLD}{WHITE}###{RED} DISCLAIMER:{RESET}\n")
         print(f"{WHITE}[{RED}!{WHITE}]{RESET} 'WPA2-PSK Password MIC Cracker' is a tool designed for security audits on WPA2-PSK (Personal) IEEE 802.11 (Wi-Fi) networks.")
         print(f"{WHITE}[{RED}!{WHITE}]{RESET} The tool is developed exclusively for educational purposes and authorized ofensive security engagements.")
         print(f"{WHITE}[{RED}!{WHITE}]{RESET} Use is strictly limited to controlled environments (physical or virtual labs).")
         print(f"{WHITE}[{RED}!{WHITE}]{RESET} Rules of Engagement (RoE) and Non-Disclosure Agreements (NDAs) are strongly recommended for any external engagements.")        
         print(f"{WHITE}[{RED}!{WHITE}]{RESET} The author assume no responsibility for any misuse of this tool. Unauthorized or unethical usage is strictly discouraged.")
-        print()
         print("\n=================================================================================================\n")
+        print(f"{BOLD}{WHITE}###{RED} WELCOME TO WPA-PSK PASSWORD MIC CRACKER by Fz3r0!{RESET}")
         print()
-
-        print(BOLD + "Please select an option by entering the corresponding number and press Enter to proceed." + RESET)
+        print(f"{YELLOW}Please select an option and press Enter to proceed...." + RESET)
         print()
         print(f"{WHITE}[{BRIGHT_BLUE}0{WHITE}]{RESET} Launch Fz3r0 MIC Cracker")
         print(f"{WHITE}[{BRIGHT_BLUE}9{WHITE}]{RESET} Exit")
@@ -248,7 +247,7 @@ def passmode():
 
             viewdata()  
             
-            print("\nATTACK SELECTION:")
+            print(f"{BOLD}{WHITE}###{RED} ATTACK SELECTION:{RESET}")
             print()
             print("[0] - Manual Password Check")  # Option to check a password manually
             print("[1] - Bruteforce Password Attack")  # Option to start a brute-force attack
@@ -273,9 +272,8 @@ def passmode():
 
                 banner()
                 viewdata()
-                print()
-                print(f"{BOLD}### Manual Passphrase Selection:{RESET}\n")
-                print(f"{WHITE}[{RED}!{WHITE}]{RESET} Passphrase to Audit:............... {RED}{WPA2Handshake.passw}{RESET}\n")  
+                print(f"{BOLD}{WHITE}###{RED} Manual PSK Passphrase Selection:{RESET}\n")
+                print(f"{WHITE}[{RED}!{WHITE}]{RESET} PSK Passphrase to Audit:..........  {RED}{WPA2Handshake.passw}{RESET}")  
                 print("\n=================================================================================================\n")
                 checkPasswd()  # Check the validity of the password (this function should be defined elsewhere)
             else:
@@ -320,14 +318,21 @@ def checkPasswd():
     ## CREAR Y MOSTRAR PMK
 
     print()
-    print("[+] Generating PMK via PBKDF2...")
+    print(F"{BOLD}{WHITE}###{RED} PMK (Pairwise Master Key) DERIVATION || PBKDF2 KDF (Key Derivation Function):")
     print()
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}PMK = 256-bit Key derived from Passphrase & SSID using PBKDF2, provides the foundation for RSNA keys in WPA2 authentication." + RESET)    
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}The PMK derives the PTK, which divides into -> KCK for MIC integrity; KEK for EAPOL message encryption; TK for data encryption; and MIC keys for data integrity." + RESET)    
+    print() 
+    print(f"{BOLD}{WHITE}PMK Formula -->{RESET} {BOLD} {GREEN}PBKDF2 {WHITE}= {WHITE}({RED}Passphrase {WHITE}+ {PURPLE}SSID{WHITE}) & {CYAN}4096 iterations >> {PINK}read(32byte){RESET}")
+    print("")
+    print(f"{BOLD}{WHITE}PMK ={RESET} ({RED}{WPA2Handshake.passw}{WHITE} + {PURPLE}{WPA2Handshake.ssid}{WHITE}) &  {CYAN}4096 iterations >> {PINK}read(32byte){RESET}  ")
+    print("")
 
     # Formula para PMK:
     PMK = PBKDF2(WPA2Handshake.passw, WPA2Handshake.ssid, 4096).read(32)
 
     # Imprimir PMK:
-    print("Pairwise Master Key (PMK): " + str(PMK.hex()))
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} PMK:................... " + str(PMK.hex()))
     print()
 
     ##########################################################################
