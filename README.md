@@ -30,6 +30,8 @@ A 4-way-handshake audit tool for cracking
 N = \left\lceil \frac{512}{160} \right\rceil = 4
 \]
 
+![Fórmula PRF512]("https://latex.codecogs.com/png.image?\dpi{200}\N = \left\lceil \frac{512}{160} \right\rceil = 4")
+
 ![Fórmula PRF512](https://latex.codecogs.com/png.image?\dpi{200}\N = \left\lceil \frac{512}{160} \right\rceil = 4)
 
 ![image](https://github.com/user-attachments/assets/14e65019-2398-4154-a361-031a0df438ee)
