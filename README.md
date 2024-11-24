@@ -13,9 +13,6 @@ A 4-way-handshake audit tool for cracking
 
 ![Fórmula PRF512](https://latex.codecogs.com/svg.image?\text{PRF}_{512}(\text{PMK},\text{text},\text{key\_data})=\text{Truncate}_{512}\left(\bigoplus_{c=0}^{N-1}\text{HMAC-SHA1}(\text{PMK},\text{text}\|\|\text{key\_data}\|\|\text{chr}(c))\right))
 
-
-
-
 ![image](https://github.com/user-attachments/assets/620b6686-db18-44e7-9800-7fea9edc3adf)
 
 
@@ -26,14 +23,18 @@ A 4-way-handshake audit tool for cracking
 3. **key_data**: Datos adicionales que incluyen las direcciones MAC del cliente y del punto de acceso, además del Nonce (aleatorio) de ambos.
 4. **chr(c)**: El contador \( c \), que asegura que cada iteración genere una salida única.
 5. **HMAC-SHA1**: Es una función hash basada en el algoritmo **SHA-1** y el uso de **PMK** como clave.
-6. **\(\bigoplus_{c=0}^{N-1}\)**: La concatenación de los resultados **HMAC-SHA1** generados en cada iteración.
+6. **\(\bigoplus_{c=0}^{N-1}\)** : La concatenación de los resultados **HMAC-SHA1** generados en cada iteración.
 7. **N**: El número de iteraciones necesarias para generar suficientes bits para obtener 512 bits. Esto depende de que cada iteración genera **160 bits** (\(20 \, \text{bytes}\)):
 
-   \[
-   N = \left\lceil \frac{512}{160} \right\rceil = 4
-   \]
+\[
+N = \left\lceil \frac{512}{160} \right\rceil = 4
+\]
 
-   Por lo tanto, se necesitan 4 iteraciones para cubrir 512 bits.
+![Fórmula PRF512](https://latex.codecogs.com/png.image?\dpi{200}\N = \left\lceil \frac{512}{160} \right\rceil = 4)
+
+![image](https://github.com/user-attachments/assets/14e65019-2398-4154-a361-031a0df438ee)
+
+Por lo tanto, se necesitan 4 iteraciones para cubrir 512 bits.
 
 8. **\(\text{Truncate}_{512}\)**: Una operación que toma únicamente los primeros **512 bits** (**64 bytes**) de la concatenación de los bloques generados.
 
