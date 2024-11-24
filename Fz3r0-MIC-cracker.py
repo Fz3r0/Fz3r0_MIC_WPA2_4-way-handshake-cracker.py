@@ -149,48 +149,57 @@ class WPA2Handshake:
 # FORMULARIO DE VARIABLES
 #
 
-## Function: Ingresar Valores de Variables en shell
-def testdata():
+## Instrucciones con banner antes del formulario
+def input_data_how():
 
     ## Instructions
+    clear_screen()
+    banner()
     line()
     print(f"{BOLD}{WHITE}###{RED} INSTRUCTIONS:{RESET} \n")
     print (f"[!] IMPORTANT: To collect the data -> Open the .pcap frame capture of the WPA2-PSK (Personal) authentication in Blackshark and extract the following:{RESET}")
 
+## Formulario: Ingresar Valores de Variables en shell
+def testdata():
+
     ## SSID   (Default: Fz3r0::CWAP
+    input_data_how()
     print(f"\n[+] Paste the SSID of the WLAN               / or Press Enter to use Default{RESET}") 
     WPA2Handshake.ssid        = input(f"{BOLD}{WHITE}->>{RESET}") or "Fz3r0::CWAP"
 
     ## AP     (Default: Telmex
+    input_data_how()
     print(f"\n[+] Paste the WLAN Address of the AP (BSSID) / or Press Enter to use Default{RESET}")
     WPA2Handshake.macAP       = input(f"{BOLD}{WHITE}->>{RESET}") or "50:4e:dc:90:2e:b8"
 
     ## STA    (Default: Xiaomi Phone
+    input_data_how()
     print(f"\n[+] Paste the WLAN Address of client STA    / or Press Enter to use Default{RESET}")
     WPA2Handshake.macCli      = input(f"{BOLD}{WHITE}->>{RESET}") or "3c:13:5a:f2:46:88"
 
     ## Anonce (Default: M1 nonce (nonce from the AP/Authenticator)
+    input_data_how()
     print(f"\n[+] Paste the Anonce - EAPOL M1 HEX Nonce - AP/Authenticator Nonce")
     print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {NEON_YELLOW}Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M1 Nonce, Right Click, Copy > As HEX Stream")
     WPA2Handshake.anonce      = input(f"{BOLD}{WHITE}->>{RESET}") or "f1b3a392f9a10693e031deb0edb996c27974f297c7963c005a5cd36116c80777"
 
-    ## Snonce = M2 nonce (nonce from the STA/Supplicant)  
+    ## Snonce = M2 nonce (nonce from the STA/Supplicant)
+    input_data_how()  
     print(f"\n[+] Paste the Snonce - EAPOL M2 HEX Nonce  - STA/Supplicant Nonce")
     print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M2 Nonce, Right Click, Copy > As HEX Stream")
     WPA2Handshake.snonce      = input(f"{BOLD}{WHITE}->>{RESET}") or "a3911874480ff4e4b772c016d107ace5e0fb5fd972e5deeae1f662edeb8b4fc0"
 
-    ## MIC   
+    ## MIC  
+    input_data_how() 
     print("\n[+] Paste the MIC (e.g. EAPOL M2 MIC)  :: ")
     print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} Hint: Copy 'HEX Stream' from Blackshark / Select EAPOL M2 MIC, Right Click, Copy > As HEX Stream")
     WPA2Handshake.mic         = input(f"{BOLD}{WHITE}->>{RESET}") or "07d2e88db2254f675d349996ef95ad93"
 
     # EAPOL 2 Frame > Only Payload (No Headers or FCS)
+    input_data_how()
     print(f"\n[+] Paste only the payload of EAPOL2 Frame in HEX (excuding MAC Header, LLC and FCS)")
     print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} Hint: To copy 'HEX stream' of EAPOL 2 frame payload, you should select ONLY the 802.1X Information Element of the M2 (the last 'directory' of the frame), you should NOT copy the entire 802.11 frame.")
     WPA2Handshake.Eapol2frame = input(f"{BOLD}{WHITE}->>{RESET}") or "0103007b02010a00000000000000000001a3911874480ff4e4b772c016d107ace5e0fb5fd972e5deeae1f662edeb8b4fc0000000000000000000000000000000000000000000000000000000000000000007d2e88db2254f675d349996ef95ad93001c301a0100000fac040100000fac040100000fac0280400000000fac06"
-
-    clear_screen()
-    banner()
 
 #######################################################################################
 #
@@ -222,9 +231,44 @@ def viewdata():
     print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} EAPOL M2 Payload:................. ", f"{CYAN}{WPA2Handshake.Eapol2frame}{RESET}")
     line()
 
+
 ####################################################################################################################
 #
+# PMK DERIVATION :: PBKDF2 ALGORYTHM
+
+# Muestra info de como mostrar el PMK por si el usuario pide mas info
+def info_pmk():
+
+    print(f"{BOLD}{WHITE}###{RED} PMK (Pairwise Master Key) DERIVATION || PBKDF2 KDF (Key Derivation Function): \n")
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}PMK = 256-bit Key derived from Passphrase & SSID using PBKDF2, provides the foundation for RSNA keys in WPA2 authentication.{RESET}")    
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}The PMK derives the PTK, which divides into -> KCK for MIC integrity; KEK for EAPOL message encryption; TK for data encryption; and MIC keys for data integrity.{RESET} \n")    
+    print(f"{BOLD}{WHITE}PMK Formula -->{RESET} {BOLD} {GREEN}PBKDF2 {WHITE}= {WHITE}({RED}Passphrase {WHITE}+ {PURPLE}SSID{WHITE}) & {CYAN}4096 iterations >> {PINK}read(32byte){RESET} \n")
+    print(f"{BOLD}{WHITE}PMK ={RESET} ({RED}{passphrase}{WHITE} + {PURPLE}{ssid}{WHITE}) &  {CYAN}4096 iterations >> {PINK}read(32byte){RESET} \n")
+
+# Función para calcular el Pairwise Master Key (PMK) a partir de la passphrase y el SSID.
+def calculate_pmk(passphrase, ssid):
+
+    # Formula para PMK:
+    PMK = PBKDF2(passphrase, ssid, 4096).read(32)
+
+
+
+    # Imprimir PMK:
+    print(f"{BOLD}{WHITE}###{RED} PMK Result:\n")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} PMK:................... {WHITE}{BOLD}" + str(PMK.hex()))
+    print()
+
+    return PMK
+
+
+####################################################################################################################
+#
+# PTK DERIVATION :: PRF512 ALGORYTHM
+
+## PRF512
+
 # Function: Algoritmo PRF512 (Para obtener PTK)
+def customPRF512(pmk, text, key_data):
 
     ## Explicación general:
 
@@ -234,7 +278,6 @@ def viewdata():
 
         # Este tipo de función es fundamental en el proceso de creación de la Pairwise Transient Key (PTK) en el protocolo WPA2, el cual se usa para cifrar las comunicaciones entre un dispositivo y el punto de acceso Wi-Fi.
 
-def customPRF512(pmk, text, key_data):
     # Inicializamos el contador c, que se utilizará para iterar y modificar la entrada del HMAC-SHA1
     c = 0
     
@@ -268,6 +311,49 @@ def customPRF512(pmk, text, key_data):
     # Finalmente, devolvemos los primeros `block` bytes (64 bytes, 512 bits) del resultado acumulado.
     # Aunque generemos más de 512 bits, solo los primeros 512 bits son los que nos interesan.
     return result[:block]
+
+def generate_ptk(PMK):
+
+    #Función para calcular el Pairwise Temporal Key (PTK) a partir del PMK.
+
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}Generating PTK...{RESET} \n")
+
+
+    ## 1. Extraer MAC de AP y quitar ":" para la operación
+    macAPparsed = WPA2Handshake.macAP.replace(":","").lower()
+    macAPparsed = binascii.a2b_hex(macAPparsed)
+    
+    ## 2. Extraer MAC de STA y quitar ":" para la operación
+    macCliparsed = WPA2Handshake.macCli.replace(":","").lower()
+    macCliparsed = binascii.a2b_hex(macCliparsed)
+    
+    ## 3. Extraer Anonce (AP) de M1 EAPOL
+    anoncep = binascii.a2b_hex(WPA2Handshake.anonce)
+
+    ## 4. Extraer Snonce (STA) de M1 EAPOL
+    snoncep = binascii.a2b_hex(WPA2Handshake.snonce)
+
+    ## 5. Calcular y concatenar el Key Data
+    key_data = min(macAPparsed, macCliparsed) + max(macAPparsed, macCliparsed) + min(anoncep, snoncep) + max(anoncep, snoncep)
+
+    # Variable "txt"
+    txt = b"Pairwise key expansion"
+
+    # Imprimir Key Data en HEx
+    print("key data: " + binascii.b2a_hex(key_data).decode())
+    print()
+
+    print("[-] Running PRF512 algorithm...")
+    print()
+
+    PTK = customPRF512(PMK, txt, key_data)
+    print("Pairwise Temporal Key (PTK): " + str(PTK.hex()))
+    print()
+    
+    return PTK
+
+
+
 
 ####################################################################################################################
 #
@@ -353,7 +439,7 @@ def crackmode():
             # @ Manual
             elif opt == 0:
                 print("Initiating Manual attack...\n") 
-                manualpassword()  
+                password_selection()  
 
             # 
             else:
@@ -363,7 +449,7 @@ def crackmode():
             print("Error: Invalid input. Please enter a valid number (0 or 9).")
 
 
-def manualpassword():
+def password_selection():
 
 
 
@@ -373,73 +459,15 @@ def manualpassword():
     banner()
     viewdata()
 
-    print(f"{BOLD}{WHITE}###{RED} Manual PSK Passphrase Selection:{RESET}\n")
-    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} PSK Passphrase to Audit:..........  {RED}{WPA2Handshake.passw}{RESET}")  
+    print(f"{BOLD}{WHITE}###{RED} PASSPHRASE FOR PMK DERIVATION:{RESET}\n")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} WPA2-PSK Passphrase to Audit:.....  {RED}{WPA2Handshake.passw}{RESET}")  
     line()
                 
     checkPasswd()  
 
 
-def calculate_pmk(passphrase, ssid):
-    """
-    Función para calcular el Pairwise Master Key (PMK) a partir de la passphrase y el SSID.
-    """
-    print(f"{BOLD}{WHITE}###{RED} PMK (Pairwise Master Key) DERIVATION || PBKDF2 KDF (Key Derivation Function): \n")
-    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}PMK = 256-bit Key derived from Passphrase & SSID using PBKDF2, provides the foundation for RSNA keys in WPA2 authentication.{RESET}")    
-    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}The PMK derives the PTK, which divides into -> KCK for MIC integrity; KEK for EAPOL message encryption; TK for data encryption; and MIC keys for data integrity.{RESET} \n")    
-    print(f"{BOLD}{WHITE}PMK Formula -->{RESET} {BOLD} {GREEN}PBKDF2 {WHITE}= {WHITE}({RED}Passphrase {WHITE}+ {PURPLE}SSID{WHITE}) & {CYAN}4096 iterations >> {PINK}read(32byte){RESET} \n")
-    print(f"{BOLD}{WHITE}PMK ={RESET} ({RED}{passphrase}{WHITE} + {PURPLE}{ssid}{WHITE}) &  {CYAN}4096 iterations >> {PINK}read(32byte){RESET} \n")
-
-    # Formula para PMK:
-    PMK = PBKDF2(passphrase, ssid, 4096).read(32)
-
-    # Imprimir PMK:
-    print(f"{BOLD}{WHITE}###{RED} PMK Result:\n")
-    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} PMK:................... {WHITE}{BOLD}" + str(PMK.hex()))
-    print()
-
-    return PMK
 
 
-def generate_ptk(PMK):
-    """
-    Función para calcular el Pairwise Temporal Key (PTK) a partir del PMK.
-    """
-    print(f"{WHITE}[{NEON_GREEN}+{WHITE}Generating PTK...{RESET}")
-    print()
-
-    ## 1. Extraer MAC de AP y quitar ":" para la operación
-    macAPparsed = WPA2Handshake.macAP.replace(":","").lower()
-    macAPparsed = binascii.a2b_hex(macAPparsed)
-    
-    ## 2. Extraer MAC de STA y quitar ":" para la operación
-    macCliparsed = WPA2Handshake.macCli.replace(":","").lower()
-    macCliparsed = binascii.a2b_hex(macCliparsed)
-    
-    ## 3. Extraer Anonce (AP) de M1 EAPOL
-    anoncep = binascii.a2b_hex(WPA2Handshake.anonce)
-
-    ## 4. Extraer Snonce (STA) de M1 EAPOL
-    snoncep = binascii.a2b_hex(WPA2Handshake.snonce)
-
-    ## 5. Calcular y concatenar el Key Data
-    key_data = min(macAPparsed, macCliparsed) + max(macAPparsed, macCliparsed) + min(anoncep, snoncep) + max(anoncep, snoncep)
-
-    # Variable "txt"
-    txt = b"Pairwise key expansion"
-
-    # Imprimir Key Data en HEx
-    print("key data: " + binascii.b2a_hex(key_data).decode())
-    print()
-
-    print("[-] Running PRF512 algorithm...")
-    print()
-
-    PTK = customPRF512(PMK, txt, key_data)
-    print("Pairwise Temporal Key (PTK): " + str(PTK.hex()))
-    print()
-    
-    return PTK
 
 
 
