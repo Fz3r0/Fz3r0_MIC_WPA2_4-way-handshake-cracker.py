@@ -7,19 +7,6 @@ A 4-way-handshake audit tool for cracking
 
 ## Fórmula general
 
-PRF 
-512
-​
- (PMK,text,key_data)=Truncate 
-512
-​
- ( 
-c=0
-⨁
-N−1
-​
- HMAC-SHA1(PMK,text∣∣key_data∣∣chr(c)))
-
 \[
 \text{PRF}_{512}(\text{PMK}, \text{text}, \text{key\_data}) = \text{Truncate}_{512}\left(\bigoplus_{c=0}^{N-1} \text{HMAC-SHA1}(\text{PMK}, \text{text} || \text{key\_data} || \text{chr}(c))\right)
 \]
