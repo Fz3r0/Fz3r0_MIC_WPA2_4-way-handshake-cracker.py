@@ -30,6 +30,8 @@ A 4-way-handshake audit tool for cracking
 N = \left\lceil \frac{512}{160} \right\rceil = 4
 \]
 
+![caca](https://latex.codecogs.com/png.image?\dpi{200}\text{PRF}_{512}(\text{PMK},\text{text},\text{key\_data})=\text{Truncate}_{512}\left(\bigoplus_{c=0}^{N-1}\text{HMAC-SHA1}(\text{PMK},\text{text}||\text{key\_data}||\text{chr}(c))\right))
+
 ![Fórmula PRF512](https://latex.codecogs.com/png.image?\dpi{200}\text{PRF}_{512}(\text{PMK},\text{text},\text{key\_data})=\text{Truncate}_{512}\left(\bigoplus_{c=0}^{N-1}\text{HMAC-SHA1}(\text{PMK},\text{text}||\text{key\_data}||\text{chr}(c))\right))
 
 
