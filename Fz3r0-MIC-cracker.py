@@ -1,6 +1,4 @@
 import hmac,hashlib
-import scapy
-from scapy.all import *
 from pbkdf2 import PBKDF2
 import binascii
 import os
@@ -240,10 +238,23 @@ def viewdata():
 def info_pmk():
 
     print(f"{BOLD}{WHITE}###{RED} PMK (Pairwise Master Key) DERIVATION || PBKDF2 KDF (Key Derivation Function): \n")
-    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}PMK = 256-bit Key derived from Passphrase & SSID using PBKDF2, provides the foundation for RSNA keys in WPA2 authentication.{RESET}")    
-    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}The PMK derives the PTK, which divides into -> KCK for MIC integrity; KEK for EAPOL message encryption; TK for data encryption; and MIC keys for data integrity.{RESET} \n")    
-    print(f"{BOLD}{WHITE}PMK Formula -->{RESET} {BOLD} {GREEN}PBKDF2 {WHITE}= {WHITE}({RED}Passphrase {WHITE}+ {PURPLE}SSID{WHITE}) & {CYAN}4096 iterations >> {PINK}read(32byte){RESET} \n")
-    print(f"{BOLD}{WHITE}PMK ={RESET} ({RED}{passphrase}{WHITE} + {PURPLE}{ssid}{WHITE}) &  {CYAN}4096 iterations >> {PINK}read(32byte){RESET} \n")
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}PMK = 32 bytes (256-bit) Key derived from PSK Passphrase & SSID using PBKDF2.{RESET}")    
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}PMK provides the foundation for RSNA keys in WPA2 authentication.{RESET} \n")  
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {YELLOW}PMK is derived by the AP & client STA; both PMKs should match to unlock ecrypted data.{RESET} \n")      
+    print(f"{WHITE}[{NEON_YELLOW}-{WHITE}]{RESET} {YELLOW}The PMK derives:{RESET} \n")    
+    print(f"   {WHITE}[{NEON_YELLOW}1{WHITE}]{RESET} {YELLOW}PTK (Pairwise Transient Key) - which divides into -> {RESET} \n")     
+    print(f"      {WHITE}[{NEON_YELLOW}1.1{WHITE}]{RESET} {YELLOW}KEK (Key Encryption Key):..... For EAPOL message encryption. {RESET}")  
+    print(f"      {WHITE}[{NEON_YELLOW}1.2{WHITE}]{RESET} {YELLOW}TK  (Temporal Key):........... For DATA encryption (MSDU Data Tx/Rx).{RESET}")  
+    print(f"      {WHITE}[{NEON_YELLOW}1.3{WHITE}]{RESET} {YELLOW}KCK (Key Confirmation Key):... for MIC integrity. {RESET}")  
+    print(f"      {WHITE}[{NEON_YELLOW}1.4{WHITE}]{RESET} {YELLOW}MICs: For DATA integrity.{RESET}")  
+
+    line2()
+
+    print(f"{BOLD}{WHITE}PMK Formula    -->{RESET} {BOLD} {GREEN}PBKDF2 {WHITE}= {WHITE}({RED}Passphrase {WHITE}+ {PURPLE}SSID{WHITE}) * {CYAN}4096 iterations -->> {PINK}read(32byte){RESET} \n")
+    print(f"{BOLD}{WHITE}PMK Derivation -->{RESET} {BOLD} {GREEN}PBKDF2 {WHITE}= {WHITE}({RED}{WPA2Handshake.passw} {WHITE}+ {PURPLE}{WPA2Handshake.ssid}{WHITE}) * {CYAN}4096 iterations -->> {PINK}read(32byte){RESET}")
+
+    line2()
+
 
 # Función para calcular el Pairwise Master Key (PMK) a partir de la passphrase y el SSID.
 def calculate_pmk(passphrase, ssid):
@@ -251,19 +262,44 @@ def calculate_pmk(passphrase, ssid):
     # Formula para PMK:
     PMK = PBKDF2(passphrase, ssid, 4096).read(32)
 
-
-
     # Imprimir PMK:
     print(f"{BOLD}{WHITE}###{RED} PMK Result:\n")
     print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} PMK:................... {WHITE}{BOLD}" + str(PMK.hex()))
-    print()
-
     return PMK
+    line()
 
 
 ####################################################################################################################
 #
 # PTK DERIVATION :: PRF512 ALGORYTHM
+
+
+
+def ptk_info():
+    print(f"{BOLD}{WHITE}### {RED}PTK (Pairwise Transient Key) DERIVATION || PRF512 ALGORITHM:{RESET}\n")
+    
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}] {YELLOW}PTK = 512-bit Key derived from PMK, MAC addresses, and nonces using PRF512 (Pseudo-Random Function).{RESET}")
+    print(f"{WHITE}[{NEON_YELLOW}?{WHITE}] {YELLOW}This key is used to secure WPA2 communications by providing encryption and integrity for data frames.{RESET}\n")
+    
+    print(f"{BOLD}{WHITE}General Formula:{RESET}")
+    print(f"{WHITE}PTK = PRF512(PMK, 'Pairwise key expansion', Key Data){RESET}\n")
+    
+    print(f"{BOLD}{WHITE}Where:{RESET}")
+    print(f"  - {CYAN}PMK{WHITE}: Pairwise Master Key derived from passphrase and SSID using PBKDF2.")
+    print(f"  - {CYAN}Key Data{WHITE}: Concatenation of MAC addresses (AP & Client) and nonces (Anonce & Snonce).")
+    print(f"  - {CYAN}PRF512{WHITE}: Pseudo-Random Function using HMAC-SHA1 to generate a fixed 512-bit output.\n")
+    
+    print(f"{BOLD}{WHITE}Key Data Composition:{RESET}")
+    print(f"  {NEON_GREEN}- {WHITE}Key Data = Min(MAC_AP, MAC_Client) + Max(MAC_AP, MAC_Client) + Min(Anonce, Snonce) + Max(Anonce, Snonce){RESET}\n")
+    
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}] {RESET}PRF512 iteratively applies HMAC-SHA1 to generate a 512-bit key by processing:")
+    print(f"    {CYAN}Input:{WHITE} 'Pairwise key expansion' + Key Data + Counter")
+    print(f"    {CYAN}Key:{WHITE} PMK")
+    print(f"  Counter ensures uniqueness across iterations, producing 20-byte blocks that are concatenated until 64 bytes (512 bits) are reached.{RESET}\n")
+    
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}] {RESET}{YELLOW}This function is essential in the WPA2 handshake for establishing secure communications.{RESET}\n")
+
+
 
 ## PRF512
 
@@ -316,7 +352,16 @@ def generate_ptk(PMK):
 
     #Función para calcular el Pairwise Temporal Key (PTK) a partir del PMK.
 
-    print(f"{WHITE}[{NEON_GREEN}+{WHITE}Generating PTK...{RESET} \n")
+    line()
+
+    print(f"{BOLD}{WHITE}###{RED} PTK DERIVATION:{RESET} \n")
+
+
+    ptk_info()
+
+
+    print(f"{BOLD}{WHITE}###{RED} PTK DERIVATION wawa:{RESET} \n")
+
 
 
     ## 1. Extraer MAC de AP y quitar ":" para la operación
@@ -440,6 +485,8 @@ def crackmode():
             elif opt == 0:
                 print("Initiating Manual attack...\n") 
                 password_selection()  
+                info_pmk()
+                checkPasswd() 
 
             # 
             else:
@@ -463,7 +510,7 @@ def password_selection():
     print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} WPA2-PSK Passphrase to Audit:.....  {RED}{WPA2Handshake.passw}{RESET}")  
     line()
                 
-    checkPasswd()  
+     
 
 
 
@@ -495,11 +542,18 @@ def calculate_mic(ptk, eapol_frame):
     print("    - Se extrae la KCK (Key Confirmation Key) de los primeros 16 bytes del PTK (Pairwise Transient Key).")
     print("    - La KCK siempre tiene una longitud de 16 bytes, que es suficiente para la generación del MIC.")
     print()
-    print("[*] KCK: ")
+  
 
     KCK = ptk[0:16]
-    print(KCK)  
+
+    # para imprimir el binario raw de raws solo usar "print(KCK)"
+    # para imprimirlo tipo Hex Strear usar "  print(str(KCK.hex()))"   
+    print("[*] KCK: " + str(KCK.hex()))
+
+
+
     print()
+
     line() 
 
 
