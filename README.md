@@ -16,6 +16,7 @@ A 4-way-handshake audit tool for cracking
 ![image](https://github.com/user-attachments/assets/620b6686-db18-44e7-9800-7fea9edc3adf)
 
 
+
 ## Desglose de la fórmula
 
 1. **PMK**: Es la clave derivada de la contraseña Wi-Fi (**Pairwise Master Key**). Es el secreto base.
