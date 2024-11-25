@@ -142,6 +142,10 @@ class WPA2Handshake:
     passw = ''
     Eapol2frame = ''
 
+## CLASS: Variables para erl tipo de ataque (esto ayuda para que las fucniones sepan que tan "deep" ir)
+class attack_type:
+    attack_type = 0  
+    
 #######################################################################################
 #
 # FORMULARIO DE VARIABLES
@@ -473,17 +477,19 @@ def crackmode():
 
             # @ Main
             if opt == 9:
-                print("Returning to main menu...\n")  
+                print(f"Returning to main menu...\n")  
                 main()  
             
             # @ BruteForce
             elif opt == 1:
-                print("Initiating Bruteforce attack...\n") 
+                attack_type.attack_type = 1
+                print(f"Initiating Bruteforce attack...\n") 
                 checkPasswdWordlist()  
             
             # @ Manual
             elif opt == 0:
-                print("Initiating Manual attack...\n") 
+                attack_type.attack_type = 0
+                print(f"Initiating Manual attack...\n") 
                 password_selection()  
                 info_pmk()
                 checkPasswd() 
