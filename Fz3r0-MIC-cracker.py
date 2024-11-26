@@ -143,8 +143,9 @@ class WPA2Handshake:
     Eapol2frame = ''
 
 ## CLASS: Variables para erl tipo de ataque (esto ayuda para que las fucniones sepan que tan "deep" ir)
-class attack_type:
-    attack_type = 0  
+class switches:
+    attack_type = 0
+    pass_given = 0
     
 #######################################################################################
 #
@@ -221,6 +222,7 @@ def testpassword():
  
 # Visualize Variables in Shell
 def viewdata():
+    
     line()
     print(f"{BOLD}{WHITE}###{RED} EAPOL M1 & M2 data:{RESET}\n")
     print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {NEON_YELLOW}4-Way-Handshake (EAPOL M1 & M2) data needed for MIC validation & cracking:{RESET}\n")
@@ -482,13 +484,13 @@ def crackmode():
             
             # @ BruteForce
             elif opt == 1:
-                attack_type.attack_type = 1
+                switches.attack_type = 1
                 print(f"Initiating Bruteforce attack...\n") 
                 checkPasswdWordlist()  
             
             # @ Manual
             elif opt == 0:
-                attack_type.attack_type = 0
+                switches.attack_type = 0
                 print(f"Initiating Manual attack...\n") 
                 password_selection()  
                 info_pmk()
