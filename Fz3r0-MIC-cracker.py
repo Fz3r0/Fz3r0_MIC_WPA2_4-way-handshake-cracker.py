@@ -224,6 +224,11 @@ def testpassword():
 def viewdata():
     
     line()
+    if pass_given == 0:
+        WPA2Handshake.passw = "Waiting for Password..."
+    else:
+        WPA2Handshake.passw = WPA2Handshake.passw
+        
     print(f"{BOLD}{WHITE}###{RED} EAPOL M1 & M2 data:{RESET}\n")
     print(f"{WHITE}[{NEON_YELLOW}?{WHITE}]{RESET} {NEON_YELLOW}4-Way-Handshake (EAPOL M1 & M2) data needed for MIC validation & cracking:{RESET}\n")
     print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} SSID:............................. ", f"{PURPLE}{WPA2Handshake.ssid}{RESET}")
@@ -233,6 +238,7 @@ def viewdata():
     print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} Snonce (STA):..................... ", f"{ORANGE}{WPA2Handshake.snonce}{RESET}")
     print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} MIC (EAPOL M2):................... ", f"{MAGENTA}{WPA2Handshake.mic}{RESET}")
     print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} EAPOL M2 Payload:................. ", f"{CYAN}{WPA2Handshake.Eapol2frame}{RESET}")
+    print(f"{WHITE}[{NEON_GREEN}+{WHITE}]{RESET} WPA2-PSK Passphrase (Password):... ", f"{RED}{WPA2Handshake.passw}{RESET}")
     line()
 
 
