@@ -55,3 +55,8 @@ Por lo tanto, se necesitan 4 iteraciones para cubrir 512 bits.
 ## Descripción del propósito
 
 Este algoritmo se utiliza en el proceso de creación de la **Pairwise Transient Key (PTK)** en el protocolo **WPA2**, el cual es fundamental para cifrar las comunicaciones entre un dispositivo y el punto de acceso Wi-Fi.
+
+## 4 way handshake 
+
+<img width="1288" height="1131" alt="image" src="https://github.com/user-attachments/assets/dd7e24a9-87c7-403e-85b5-d0eb4a6e5f4b" />
+
