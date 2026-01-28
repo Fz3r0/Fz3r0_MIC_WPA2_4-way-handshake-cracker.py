@@ -1,7 +1,14 @@
 # Fz3r0_MIC_WPA2_4-way-handshake-cracker.py
 A 4-way-handshake audit tool for cracking 
 
-![image](https://github.com/user-attachments/assets/b968f745-e8aa-4504-9cc8-d808ba5b6836)
+<img width="806" height="554" alt="image" src="https://github.com/user-attachments/assets/aeb25b7b-1ba8-4322-8bf8-24b06b1a4d85" />
+
+<img width="875" height="728" alt="image" src="https://github.com/user-attachments/assets/2fe7599d-b3ed-4c7a-9747-b300d9be2649" />
+
+<img width="505" height="524" alt="image" src="https://github.com/user-attachments/assets/a246bcc2-8c4a-40e6-9a7e-aa2187d60a53" />
+
+<img width="474" height="432" alt="image" src="https://github.com/user-attachments/assets/37d43b89-c58c-473c-b228-fb15e826eaf3" />
+
 
 # Algoritmo PRF512 (Para obtener PTK)
 
